@@ -14,7 +14,6 @@ import (
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
-	//"os"
 )
 
 func CopyFile(src, dst string) (err error) {

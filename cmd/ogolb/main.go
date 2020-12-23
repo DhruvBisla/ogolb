@@ -16,20 +16,16 @@ func main() {
 		case "setup":
 			fmt.Println("Setup requested")
 			setup.Setup()
-			// Call appropriate functions here
 		case "build":
 			fmt.Println("Build requested")
 			build.Build()
-			// Call appropriate functions here
 		case "serve":
 			fmt.Println("Serve reqeusted")
 			serve.Serve()
-			// Call appropriate functions here
 		case "help":
 			fmt.Println("Try 'init' to get started or 'build' to build your project")
 		default:
 			fmt.Println("Nothing given")
-			// Return so useful message
 		}
 	} else {
 		fmt.Println("Try 'help' to learn about things you can do")

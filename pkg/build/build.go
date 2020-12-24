@@ -146,10 +146,13 @@ type post struct {
 	Body    template.HTML
 }
 
+type posts []post
+
 func Build() {
 	fmt.Println(allFiles())
 	md := newCustomParser()
 	files, err := allFiles()
+	var ps posts = make([]post, len(files))
 	if err != nil {
 		panic(err)
 	}
@@ -183,9 +186,11 @@ func Build() {
 			Summary: fmt.Sprintf("%v", data["Summary"]),
 			Body:    template.HTML(buf.String()),
 		}
+		ps = append(ps, p)
 		tmpl.Execute(&t, p)
 		err = ioutil.WriteFile(filepath.Join(".", "public", (file[:len(file)-len(filepath.Ext(file))]+".html")), t.Bytes(), 0744)
 	}
+	
 	if err := CopyDir(filepath.Join(".", "static"), filepath.Join(".", "public", "static")); err != nil {
 		panic(err)
 	}

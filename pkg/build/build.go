@@ -141,7 +141,6 @@ func newCustomParser() goldmark.Markdown {
 
 type post struct {
 	Title   string
-	Tags    interface{}
 	Summary string
 	Body    template.HTML
 }
@@ -180,9 +179,9 @@ func Build() {
 			panic(err)
 		}
 		var t bytes.Buffer
+
 		var p post = post{
 			Title:   fmt.Sprintf("%v", data["Title"]),
-			Tags:    fmt.Sprintf("%v", data["Tags"]),
 			Summary: fmt.Sprintf("%v", data["Summary"]),
 			Body:    template.HTML(buf.String()),
 		}
@@ -190,7 +189,7 @@ func Build() {
 		tmpl.Execute(&t, p)
 		err = ioutil.WriteFile(filepath.Join(".", "public", (file[:len(file)-len(filepath.Ext(file))]+".html")), t.Bytes(), 0744)
 	}
-	
+
 	if err := CopyDir(filepath.Join(".", "static"), filepath.Join(".", "public", "static")); err != nil {
 		panic(err)
 	}

@@ -139,19 +139,24 @@ func newCustomParser() goldmark.Markdown {
 	)
 }
 
-type post struct {
-	Title   string
-	Summary string
-	Body    template.HTML
+type Post struct {
+	Title      string
+	Identifier string
+	Summary    string
+	Date       string
+	Body       template.HTML
 }
 
-type posts []post
+type Posts struct {
+	Posts []Post
+}
 
 func Build() {
+	var i bytes.Buffer
 	fmt.Println(allFiles())
 	md := newCustomParser()
 	files, err := allFiles()
-	var ps posts = make([]post, len(files))
+	var ps Posts
 	if err != nil {
 		panic(err)
 	}
@@ -174,22 +179,37 @@ func Build() {
 			panic(err)
 		}
 		data := meta.Get(context)
-		tmpl, err := template.ParseFiles(filepath.Join(".", "templates", "post.html"))
+		tmpl, err := template.ParseFiles(filepath.Join(".", "templates", "post.html"), filepath.Join(".", "templates", "header.html"), filepath.Join(".", "templates", "footer.html"))
 		if err != nil {
 			panic(err)
 		}
 		var t bytes.Buffer
-
-		var p post = post{
-			Title:   fmt.Sprintf("%v", data["Title"]),
-			Summary: fmt.Sprintf("%v", data["Summary"]),
-			Body:    template.HTML(buf.String()),
+		var p Post = Post{
+			Title:      fmt.Sprintf("%v", data["Title"]),
+			Identifier: fmt.Sprintf("%v", data["Identifier"]),
+			Summary:    fmt.Sprintf("%v", data["Summary"]),
+			Date:       fmt.Sprintf("%v", data["Date"]),
+			Body:       template.HTML(buf.String()),
 		}
-		ps = append(ps, p)
-		tmpl.Execute(&t, p)
-		err = ioutil.WriteFile(filepath.Join(".", "public", (file[:len(file)-len(filepath.Ext(file))]+".html")), t.Bytes(), 0744)
+		ps.Posts = append(ps.Posts, p)
+		tmpl.ExecuteTemplate(&t, "post.html", p)
+		err = ioutil.WriteFile(filepath.Join(".", "public", (p.Identifier+".html")), t.Bytes(), 0744)
+		if err != nil {
+			panic(err)
+		}
 	}
-
+	ind, err := template.ParseFiles(filepath.Join(".", "templates", "index.html"), filepath.Join(".", "templates", "header.html"), filepath.Join(".", "templates", "footer.html"))
+	if err != nil {
+		panic(err)
+	}
+	err = ind.ExecuteTemplate(&i, "index.html", ps)
+	if err != nil {
+		panic(err)
+	}
+	err = ioutil.WriteFile(filepath.Join(".", "public", "index.html"), i.Bytes(), 0744)
+	if err != nil {
+		panic(err)
+	}
 	if err := CopyDir(filepath.Join(".", "static"), filepath.Join(".", "public", "static")); err != nil {
 		panic(err)
 	}

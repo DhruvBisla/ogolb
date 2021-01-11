@@ -210,6 +210,9 @@ func Build() {
 	if err != nil {
 		panic(err)
 	}
+	if err := CopyFile(filepath.Join(".", "templates", "404.html"), filepath.Join(".", "public", "404.html")); err != nil {
+		fmt.Println("Warning: no 404 template provided")
+	}
 	if err := CopyDir(filepath.Join(".", "static"), filepath.Join(".", "public", "static")); err != nil {
 		panic(err)
 	}
